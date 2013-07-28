@@ -48,3 +48,4 @@ The **visibility** behavior requires four parameters to work:
 Each hierarchy has to follow this pattern:
 
     when it's visible for VISIBILITY_1 it's visible for VISIBILITY_2
+    
