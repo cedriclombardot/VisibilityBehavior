@@ -80,6 +80,26 @@ class VisibilityObjectBuilderModifier
         ));
     }
 
+    public function addHydrate($builder)
+    {
+        $hydrates = array();
+
+        foreach ($this->behavior->getVisibilities() as $visibility) {
+            $hydrates[] = array(
+                'methodName'       => $this->getVisibilityHydrater($visibility),
+                'visibility'       => $this->getVisibilityConstant($visibility),
+                'visibilityLabel'  => $visibility,
+                'fieldsSetter'     => $this->getApplyToSetters(),
+                'isVisibleMethods' => $this->getVisibilityIssers($visibility),
+            );
+        }
+
+        return $this->behavior->renderTemplate('objectHydrateAs', array(
+            'hydrates'          => $hydrates,
+            'objectClass'       => $this->behavior->getTable()->getPhpName(),
+        ));
+    }
+
     public function objectMethods($builder)
     {
         $script  = '';
@@ -87,6 +107,7 @@ class VisibilityObjectBuilderModifier
         $script .= $this->addGetNormalizedVisibilities($builder);
         $script .= $this->addIssers($builder);
         $script .= $this->addCopy($builder);
+        $script .= $this->addHydrate($builder);
 
         return $script;
     }
@@ -126,6 +147,11 @@ class VisibilityObjectBuilderModifier
     protected function getVisibilityCopier($visibility)
     {
         return 'copyAsVisibleFor'. $this->behavior->camelize($visibility);
+    }
+
+    protected function getVisibilityHydrater($visibility)
+    {
+        return 'reloadAsVisibleFor'. $this->behavior->camelize($visibility);
     }
 
     protected function getVisibilityConstant($visibility)
